@@ -1,6 +1,9 @@
 import skygear
 from skygear.models import DirectAccessControlEntry, PublicAccessControlEntry
 from skygear.utils.context import current_user_id
+from skygear.action import push_user
+from skygear.container import SkygearContainer
+from .utils import MASTER_KEY
 
 from .exc import SkygearChatException
 from .pubsub import _publish_event
@@ -78,9 +81,30 @@ def pubsub_conversation_after_save(record, original_record, conn):
         p_ids = p_ids | orig_participant
 
     # Notification
+    container = SkygearContainer(api_key=MASTER_KEY)
     for p_id in p_ids:
         _publish_event(
             p_id, "conversation", "update", record, original_record)
+        push_user(
+            container, p_id, {
+                'apns': {
+                    'aps': {
+                        'alert': 'You got a new message!',
+                    },
+                    'from': 'skygear',
+                    'operation': 'notification',
+                },
+                'gcm': {
+                    'notification': {
+                        'title': 'Exciting News for you',
+                        'body': 'You got a new message!',
+                    },
+                    'data': {
+                        'from': 'skygear',
+                        'operation': 'notification',
+                    },
+                }
+            })
 
 
 @skygear.before_delete("conversation", async=False)
