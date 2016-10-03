@@ -3,8 +3,6 @@ from skygear.pubsub import publish
 from .encoding import serialize_record
 from .utils import _get_channel_by_user_id
 
-CONSULTATION_QUEUE_CHANNEL_NAME = 'consultation_queue'
-
 
 def _publish_event(participant_id, record_type, event_type, record,
                    original_record=None):
@@ -22,17 +20,3 @@ def _publish_event(participant_id, record_type, event_type, record,
 
     if channel_name:
         publish(channel_name, data)
-
-
-def _publish_consultation_queue_event(event_type, record,
-                                      original_record=None):
-    serialize_orig_record = None
-    if original_record is not None:
-        serialize_orig_record = serialize_record(original_record)
-    data = {
-        'event_type': event_type,
-        'record': serialize_record(record),
-        'original_record': serialize_orig_record
-    }
-
-    publish(CONSULTATION_QUEUE_CHANNEL_NAME, data)

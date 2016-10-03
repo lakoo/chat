@@ -6,7 +6,7 @@ from skygear.container import SkygearContainer
 from .utils import MASTER_KEY
 
 from .exc import SkygearChatException
-from .pubsub import _publish_event, _publish_consultation_queue_event
+from .pubsub import _publish_event
 from .user_conversation import UserConversation
 
 
@@ -85,8 +85,6 @@ def pubsub_conversation_after_save(record, original_record, conn):
     for p_id in p_ids:
         _publish_event(
             p_id, "conversation", "update", record, original_record)
-        _publish_consultation_queue_event(
-            "update", record, original_record)
         push_user(
             container, p_id, {
                 'apns': {
@@ -120,4 +118,3 @@ def handle_conversation_after_delete(record, conn):
     for p_id in record['participant_ids']:
         _publish_event(
             p_id, "conversation", "delete", record)
-        _publish_consultation_queue_event("delete", record)
