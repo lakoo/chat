@@ -7,7 +7,7 @@ from skygear.utils.context import current_user_id
 
 from .asset import sign_asset_url
 from .exc import SkygearChatException
-from .pubsub import _publish_event
+from .pubsub import _publish_event, publish_message_in_conversation_channel
 from .utils import _get_conversation, schema_name
 
 
@@ -25,12 +25,14 @@ def handle_message_before_save(record, original_record, conn):
 
 @skygear.after_save("message")
 def handle_message_after_save(record, original_record, conn):
+    publish_message_in_conversation_channel(record)
     conversation = _get_conversation(record['conversation_id'])
     for p_id in conversation['participant_ids']:
         _publish_event(
             p_id, "message", "create", record)
     # Update all UserConversation unread count by 1
     conversation_id = record['conversation_id'].recordID.key
+
     conn.execute('''
         UPDATE %(schema_name)s.user_conversation
         SET "unread_count" = "unread_count" + 1
