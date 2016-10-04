@@ -22,7 +22,7 @@ def _publish_event(participant_id, record_type, event_type, record,
         publish(channel_name, data)
 
 
-def publish_message_in_conversation_channel(record):
+def publish_message_in_crm_channel(record):
     channel_name = record['conversation_id'].recordID.key
     data = serialize_record(record)
     publish(channel_name, data)

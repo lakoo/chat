@@ -7,7 +7,7 @@ from skygear.utils.context import current_user_id
 
 from .asset import sign_asset_url
 from .exc import SkygearChatException
-from .pubsub import _publish_event, publish_message_in_conversation_channel
+from .pubsub import _publish_event, publish_message_in_crm_channel
 from .utils import _get_conversation, schema_name
 
 
@@ -25,7 +25,7 @@ def handle_message_before_save(record, original_record, conn):
 
 @skygear.after_save("message")
 def handle_message_after_save(record, original_record, conn):
-    publish_message_in_conversation_channel(record)
+    publish_message_in_crm_channel(record)
     conversation = _get_conversation(record['conversation_id'])
     for p_id in conversation['participant_ids']:
         _publish_event(
@@ -63,7 +63,7 @@ def get_messages(conversation_id, limit, before_time=None):
             FROM %(schema_name)s.message
             WHERE conversation_id = %(conversation_id)s
             AND (_created_at < %(before_time)s OR %(before_time)s IS NULL)
-            ORDER BY _created_at DESC
+            ORDER BY _created_at
             LIMIT %(limit)s;
             ''', {
             'schema_name': AsIs(schema_name),
