@@ -16,6 +16,10 @@ def _publish_event(participant_id, record_type, event_type, record,
         'original_record': serialize_orig_record
     }
 
+    if record_type == 'message':
+        conversation_id = record['conversation_id'].recordID.key
+        publish(conversation_id, data)
+
     channel_name = _get_channel_by_user_id(participant_id)
 
     if channel_name:
