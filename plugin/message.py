@@ -30,6 +30,7 @@ def handle_message_after_save(record, original_record, conn):
     for p_id in conversation['participant_ids']:
         _publish_event(
             p_id, "message", "create", record)
+
     # Update all UserConversation unread count by 1
     conversation_id = record['conversation_id'].recordID.key
 
@@ -47,8 +48,9 @@ def handle_message_after_save(record, original_record, conn):
 def get_messages(conversation_id, limit, before_time=None):
     conversation = _get_conversation(conversation_id)
 
-    if current_user_id() not in conversation['participant_ids']:
-        raise SkygearChatException("user not in conversation")
+    # TODO: Should verify the user is CRM user
+    # if current_user_id() not in conversation['participant_ids']:
+    #     raise SkygearChatException("user not in conversation")
 
     # FIXME: After the ACL can be by-pass the ACL, we should query the with
     # master key
