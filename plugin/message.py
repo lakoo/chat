@@ -42,6 +42,16 @@ def handle_message_after_save(record, original_record, conn):
         'schema_name': AsIs(schema_name),
         'conversation_id': conversation_id
     })
+    conn.execute('''
+        UPDATE %(schema_name)s.user_conversation
+        SET "unread_count" = 0
+        WHERE "conversation" = %(conversation_id)s
+        AND user = %(user_id)s
+    ''', {
+        'schema_name': AsIs(schema_name),
+        'conversation_id': conversation_id,
+        'user_id': record.created_by
+    })
 
 
 @skygear.op("chat:get_messages", auth_required=True, user_required=True)
