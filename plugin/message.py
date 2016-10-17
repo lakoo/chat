@@ -73,7 +73,7 @@ def get_messages(conversation_id, limit, before_time=None):
             FROM %(schema_name)s.message
             WHERE conversation_id = %(conversation_id)s
             AND (_created_at < %(before_time)s OR %(before_time)s IS NULL)
-            ORDER BY _created_at
+            ORDER BY _created_at DESC
             LIMIT %(limit)s;
             ''', {
             'schema_name': AsIs(schema_name),
@@ -105,5 +105,5 @@ def get_messages(conversation_id, limit, before_time=None):
                     '$url': sign_asset_url(row[6])
                 }
             results.append(r)
-
-        return {'results': results}
+        resultsReverse = results.reverse()
+        return {'results': resultsReverse}
