@@ -105,5 +105,5 @@ def get_messages(conversation_id, limit, before_time=None):
                     '$url': sign_asset_url(row[6])
                 }
             results.append(r)
-        resultsReverse = results.reverse()
+        resultsReverse=results[::-1]
         return {'results': resultsReverse}
