@@ -5,11 +5,13 @@ import skygear
 from skygear.utils import db
 from skygear.action import push_user
 from skygear.utils.context import current_user_id
+from skygear.container import SkygearContainer
 
 from .asset import sign_asset_url
 from .exc import SkygearChatException
 from .pubsub import _publish_event, publish_message_in_crm_channel
 from .utils import _get_conversation, schema_name
+from .utils import MASTER_KEY
 
 
 @skygear.before_save("message", async=False)
@@ -32,7 +34,7 @@ def handle_message_after_save(record, original_record, conn):
     for p_id in conversation['participant_ids']:
         _publish_event(
             p_id, "message", "create", record)
-        if p_id = conversation.created_by and record.created_by is not p_id:
+        if p_id == conversation.created_by and record.created_by != p_id:
             push_user(
                 container, p_id, {
                     'apns': {
