@@ -12,6 +12,8 @@ from .exc import SkygearChatException
 from .pubsub import _publish_event, publish_message_in_crm_channel
 from .utils import _get_conversation, schema_name
 from .utils import MASTER_KEY
+import logging
+log = logging.getLogger()
 
 
 @skygear.before_save("message", async=False)
@@ -34,51 +36,12 @@ def handle_message_after_save(record, original_record, conn):
     for p_id in conversation['participant_ids']:
         _publish_event(
             p_id, "message", "create", record)
+        log.debug('handle_message_after_save ' + record.created_by + 'conversation created by: '+ conversation.created_by)
         push_user(
             container, p_id, {
                 'apns': {
                     'aps': {
-                        'alert': p_id + record['body'],
-                    },
-                    'from': 'skygear',
-                    'operation': 'notification',
-                },
-                'gcm': {
-                    'notification': {
-                        'title': '',
-                        'body': record['body'],
-                    },
-                    'data': {
-                        'from': 'skygear',
-                        'operation': 'notification',
-                    },
-                }
-            })
-        push_user(
-            container, p_id, {
-                'apns': {
-                    'aps': {
-                        'alert': 'conversation created by' + conversation.created_by,
-                    },
-                    'from': 'skygear',
-                    'operation': 'notification',
-                },
-                'gcm': {
-                    'notification': {
-                        'title': '',
-                        'body': record['body'],
-                    },
-                    'data': {
-                        'from': 'skygear',
-                        'operation': 'notification',
-                    },
-                }
-            })
-        push_user(
-            container, p_id, {
-                'apns': {
-                    'aps': {
-                        'alert': 'record created by' + record.created_by,
+                        'alert': record['body'],
                     },
                     'from': 'skygear',
                     'operation': 'notification',
