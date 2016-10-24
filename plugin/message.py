@@ -38,7 +38,47 @@ def handle_message_after_save(record, original_record, conn):
             container, p_id, {
                 'apns': {
                     'aps': {
-                        'alert': record['body'],
+                        'alert': p_id + record['body'],
+                    },
+                    'from': 'skygear',
+                    'operation': 'notification',
+                },
+                'gcm': {
+                    'notification': {
+                        'title': '',
+                        'body': record['body'],
+                    },
+                    'data': {
+                        'from': 'skygear',
+                        'operation': 'notification',
+                    },
+                }
+            })
+        push_user(
+            container, p_id, {
+                'apns': {
+                    'aps': {
+                        'alert': 'conversation created by' + conversation.created_by,
+                    },
+                    'from': 'skygear',
+                    'operation': 'notification',
+                },
+                'gcm': {
+                    'notification': {
+                        'title': '',
+                        'body': record['body'],
+                    },
+                    'data': {
+                        'from': 'skygear',
+                        'operation': 'notification',
+                    },
+                }
+            })
+        push_user(
+            container, p_id, {
+                'apns': {
+                    'aps': {
+                        'alert': 'record created by' + record.created_by,
                     },
                     'from': 'skygear',
                     'operation': 'notification',
