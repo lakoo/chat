@@ -36,7 +36,8 @@ def handle_message_after_save(record, original_record, conn):
     for p_id in conversation['participant_ids']:
         _publish_event(
             p_id, "message", "create", record)
-        log.debug('handle_message_after_save ' + record + 'conversation created by: '+ conversation)
+        log.debug('handle_message_after_save %s', record)
+        log.debug('conversation created by: %s', conversation)
         push_user(
             container, p_id, {
                 'apns': {
