@@ -36,28 +36,29 @@ def handle_message_after_save(record, original_record, conn):
     for p_id in conversation['participant_ids']:
         _publish_event(
             p_id, "message", "create", record)
-        log.debug('handle_message_after_save %s', record)
-        log.debug('conversation created by: %s', conversation)
-        push_user(
-            container, p_id, {
-                'apns': {
-                    'aps': {
-                        'alert': record['body'],
-                    },
-                    'from': 'skygear',
-                    'operation': 'notification',
-                },
-                'gcm': {
-                    'notification': {
-                        'title': '',
-                        'body': record['body'],
-                    },
-                    'data': {
+        log.debug('handle_message_after_save %s', record.created_by)
+        log.debug('conversation created by: %s', conversation['_created_by'])
+        if p_id == conversation['_created_by'] and p_id != record.created_by:
+            push_user(
+                container, p_id, {
+                    'apns': {
+                        'aps': {
+                            'alert': record['body'],
+                        },
                         'from': 'skygear',
                         'operation': 'notification',
                     },
-                }
-            })
+                    'gcm': {
+                        'notification': {
+                            'title': '',
+                            'body': record['body'],
+                        },
+                        'data': {
+                            'from': 'skygear',
+                            'operation': 'notification',
+                        },
+                    }
+                })
 
     # Update all UserConversation unread count by 1
     conversation_id = record['conversation_id'].recordID.key
