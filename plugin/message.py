@@ -3,6 +3,7 @@ from psycopg2.extensions import AsIs
 
 import skygear
 from skygear.utils import db
+from skygear.action import push_user
 from skygear.utils.context import current_user_id
 
 from .asset import sign_asset_url
@@ -27,9 +28,31 @@ def handle_message_before_save(record, original_record, conn):
 def handle_message_after_save(record, original_record, conn):
     publish_message_in_crm_channel(record)
     conversation = _get_conversation(record['conversation_id'])
+    container = SkygearContainer(api_key=MASTER_KEY)
     for p_id in conversation['participant_ids']:
         _publish_event(
             p_id, "message", "create", record)
+        if p_id = conversation.created_by and record.created_by is not p_id:
+            push_user(
+                container, p_id, {
+                    'apns': {
+                        'aps': {
+                            'alert': record['body'],
+                        },
+                        'from': 'skygear',
+                        'operation': 'notification',
+                    },
+                    'gcm': {
+                        'notification': {
+                            'title': '',
+                            'body': record['body'],
+                        },
+                        'data': {
+                            'from': 'skygear',
+                            'operation': 'notification',
+                        },
+                    }
+                })
 
     # Update all UserConversation unread count by 1
     conversation_id = record['conversation_id'].recordID.key
