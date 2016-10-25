@@ -187,4 +187,6 @@ def get_messages(conversation_id, limit, after_time=None):
                 }
             results.append(r)
         resultsReverse=results[::-1]
+        if len(resultsReverse) > 0:
+            resultsReverse.pop(0)
         return {'results': resultsReverse}
