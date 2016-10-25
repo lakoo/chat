@@ -85,8 +85,8 @@ def pubsub_conversation_after_save(record, original_record, conn):
 
     # Notification
     container = SkygearContainer(api_key=MASTER_KEY)
-    log.debug('pubsub_conversation_after_save record[is_picked_up]: %s original_record[is_picked_up]: %s', record['is_picked_up'], original_record['is_picked_up'])
-    log.debug('pubsub_conversation_after_save record[is_active]: %s original_record[is_active]: %s', record['is_active'], original_record['is_active'])
+    # log.debug('pubsub_conversation_after_save record[is_picked_up]: %s original_record[is_picked_up]: %s', record['is_picked_up'], original_record['is_picked_up'])
+    # log.debug('pubsub_conversation_after_save record[is_active]: %s original_record[is_active]: %s', record['is_active'], original_record['is_active'])
     if record['end_by'] is not None:
         log.debug('pubsub_conversation_after_save record[end_by]: %s', record['end_by'])
     for p_id in p_ids:

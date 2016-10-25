@@ -36,8 +36,8 @@ def handle_message_after_save(record, original_record, conn):
     for p_id in conversation['participant_ids']:
         _publish_event(
             p_id, "message", "create", record)
-        log.debug('handle_message_after_save %s', record.created_by)
-        log.debug('conversation created by: %s', conversation['_created_by'])
+        # log.debug('handle_message_after_save %s', record.created_by)
+        # log.debug('conversation created by: %s', conversation['_created_by'])
         if p_id == conversation['_created_by'] and p_id != record.created_by:
             push_user(
                 container, p_id, {
@@ -109,6 +109,58 @@ def get_messages(conversation_id, limit, before_time=None):
             'conversation_id': conversation_id,
             'before_time': before_time,
             'limit': limit
+        }
+        )
+
+        results = []
+        for row in cur:
+            created_stamp = row[1].timestamp()
+            dt = strict_rfc3339.timestamp_to_rfc3339_utcoffset(created_stamp)
+            r = {
+                '_id': 'message/' + row[0],
+                '_created_at': dt,
+                '_created_by': row[2],
+                'body': row[3],
+                'conversation_id': {
+                    '$id': 'conversation/' + row[4],
+                    '$type': 'ref'
+                },
+                'metadata': row[5],
+            }
+            if row[6]:
+                r['attachment'] = {
+                    '$type': 'asset',
+                    '$name': row[6],
+                    '$url': sign_asset_url(row[6])
+                }
+            results.append(r)
+        resultsReverse=results[::-1]
+        return {'results': resultsReverse}
+
+@skygear.op("chat:get_messages_after", auth_required=True, user_required=True)
+def get_messages(conversation_id, limit, after_time=None):
+    conversation = _get_conversation(conversation_id)
+
+    # TODO: Should verify the user is CRM user
+    # if current_user_id() not in conversation['participant_ids']:
+    #     raise SkygearChatException("user not in conversation")
+
+    # FIXME: After the ACL can be by-pass the ACL, we should query the with
+    # master key
+    # https://github.com/SkygearIO/skygear-server/issues/51
+    with db.conn() as conn:
+        cur = conn.execute('''
+            SELECT
+                _id, _created_at, _created_by,
+                body, conversation_id, metadata, attachment
+            FROM %(schema_name)s.message
+            WHERE conversation_id = %(conversation_id)s
+            AND (_created_at > %(after_time)s OR %(after_time)s IS NULL)
+            ORDER BY _created_at DESC
+            ''', {
+            'schema_name': AsIs(schema_name),
+            'conversation_id': conversation_id,
+            'after_time': after_time,
         }
         )
 
