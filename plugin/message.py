@@ -98,9 +98,10 @@ def get_messages(conversation_id, limit, before_time=None):
         cur = conn.execute('''
             SELECT
                 _id, _created_at, _created_by,
-                body, conversation_id, metadata, attachment
-            FROM %(schema_name)s.message
+                body, conversation_id, metadata, attachment, _user_role.role_id
+            FROM %(schema_name)s.message, %(schema_name)s._user_role
             WHERE conversation_id = %(conversation_id)s
+            AND message._created_by = _user_role.user_id
             AND (_created_at < %(before_time)s OR %(before_time)s IS NULL)
             ORDER BY _created_at DESC
             LIMIT %(limit)s;
@@ -126,6 +127,7 @@ def get_messages(conversation_id, limit, before_time=None):
                     '$type': 'ref'
                 },
                 'metadata': row[5],
+                'user_role': row[7],
             }
             if row[6]:
                 r['attachment'] = {
