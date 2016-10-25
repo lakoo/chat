@@ -97,11 +97,11 @@ def get_messages(conversation_id, limit, before_time=None):
     with db.conn() as conn:
         cur = conn.execute('''
             SELECT
-                _id, _created_at, _created_by,
-                body, conversation_id, metadata, attachment, _user_role.role_id
-            FROM %(schema_name)s.message, %(schema_name)s._user_role
+                message._id, message._created_at, message._created_by,
+                body, conversation_id, metadata, attachment, u.roles
+            FROM %(schema_name)s.message, %(schema_name)s.user AS u
             WHERE conversation_id = %(conversation_id)s
-            AND message._created_by = _user_role.user_id
+            AND message._created_by = u.user_id
             AND (_created_at < %(before_time)s OR %(before_time)s IS NULL)
             ORDER BY _created_at DESC
             LIMIT %(limit)s;
