@@ -126,7 +126,6 @@ def get_messages(conversation_id, limit, before_time=None):
                     '$type': 'ref'
                 },
                 'metadata': row[5],
-                'user_role': row[7],
             }
             if row[6]:
                 r['attachment'] = {
