@@ -49,7 +49,7 @@ def handle_message_after_save(record, original_record, conn):
                     'gcm': {
                         'notification': {
                             'title': '',
-                            'messageId': record.id,
+                            'messageId': record.id.key,
                             'body': record['body'],
                         },
                     }
