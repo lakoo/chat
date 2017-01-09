@@ -52,9 +52,8 @@ def handle_message_after_save(record, original_record, conn):
                             'body': record['body'],
                         },
                         'data': {
+                            'ringupEvent': 'MESSAGE_CREATE',
                             'messageId': record.id.key,
-                            # 'from': 'skygear',
-                            # 'operation': 'notification',
                         },
                     }
                 })

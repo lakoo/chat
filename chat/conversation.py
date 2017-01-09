@@ -110,8 +110,8 @@ def pubsub_conversation_after_save(record, original_record, conn):
                                     'body': '已有輔導員開始線上輔導',
                                 },
                                 'data': {
-                                    'from': 'skygear',
-                                    'operation': 'notification',
+                                    'ringupEvent': 'CONVERSATION_UPDATE',
+                                    'conversationId': record.id.key,
                                 },
                             }
                         })
@@ -132,8 +132,8 @@ def pubsub_conversation_after_save(record, original_record, conn):
                                         'body': '線上輔導已結束',
                                     },
                                     'data': {
-                                        'from': 'skygear',
-                                        'operation': 'notification',
+                                        "ringupEvent": "CONVERSATION_UPDATE",
+                                        'conversationId': record.id.key,
                                     },
                                 }
                             })
