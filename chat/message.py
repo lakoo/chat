@@ -47,13 +47,17 @@ def handle_message_after_save(record, original_record, conn):
                         'operation': 'notification',
                     },
                     'gcm': {
-                        'notification': {
-                            'title': '',
-                            'body': record['body'],
-                        },
+                        # We only notify the app and let the app decide whether to display a system
+                        # notification. i.e. We are creating a "Firebase Data Notification". We do
+                        # NOT use the `notification` entry:
+                        # 'notification': {
+                        #     'title': '',
+                        #     'body': record['body'],
+                        # },
                         'data': {
                             'ringupEvent': 'MESSAGE_CREATE',
-                            'messageId': record.id.key,
+                            'ringupMessageId': record.id.key,
+                            'ringupMessageBody': record['body'],
                         },
                     }
                 })

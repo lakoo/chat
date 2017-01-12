@@ -105,13 +105,17 @@ def pubsub_conversation_after_save(record, original_record, conn):
                                 'operation': 'notification',
                             },
                             'gcm': {
-                                'notification': {
-                                    'title': '',
-                                    'body': '已有輔導員開始線上輔導',
-                                },
+                                # We only notify the app and let the app decide whether to display a system
+                                # notification. i.e. We are creating a "Firebase Data Notification". We do
+                                # NOT use the `notification` entry:
+                                # 'notification': {
+                                #     'title': '',
+                                #     'body': '已有輔導員開始線上輔導',
+                                # },
                                 'data': {
                                     'ringupEvent': 'CONVERSATION_UPDATE',
-                                    'conversationId': record.id.key,
+                                    'ringupConversationId': record.id.key,
+                                    'ringupMessageBody': '已有輔導員開始線上輔導',
                                 },
                             }
                         })
@@ -127,13 +131,17 @@ def pubsub_conversation_after_save(record, original_record, conn):
                                     'operation': 'notification',
                                 },
                                 'gcm': {
-                                    'notification': {
-                                        'title': '',
-                                        'body': '線上輔導已結束',
-                                    },
+                                    # We only notify the app and let the app decide whether to display a system
+                                    # notification. i.e. We are creating a "Firebase Data Notification". We do
+                                    # NOT use the `notification` entry:
+                                    # 'notification': {
+                                    #     'title': '',
+                                    #     'body': '線上輔導已結束',
+                                    # },
                                     'data': {
                                         "ringupEvent": "CONVERSATION_UPDATE",
-                                        'conversationId': record.id.key,
+                                        'ringupConversationId': record.id.key,
+                                        'ringupMessageBody': '線上輔導已結束',
                                     },
                                 }
                             })
